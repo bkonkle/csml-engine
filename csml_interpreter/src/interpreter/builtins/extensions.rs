@@ -1,4 +1,4 @@
-use crate::error_format::{gen_error_info, ErrorInfo};
+use crate::error_format::{gen_error_info, ErrorInfo, ERROR_EXTENSION_NAME};
 use crate::{
     data::{ast::*, position::Position, ArgsType, Data, Literal, MessageData, MSG},
     error_format::ERROR_EXTENSION_UNKNOWN,
@@ -33,7 +33,7 @@ pub fn extension(
     } else {
         Err(gen_error_info(
             Position::new(interval, &data.context.flow),
-            ERROR_EXTENSION_UNKNOWN.to_owned(),
+            ERROR_EXTENSION_NAME.to_owned(),
         ))
     }
 }
