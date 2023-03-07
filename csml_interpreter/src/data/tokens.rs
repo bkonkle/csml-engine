@@ -173,7 +173,7 @@ pub const CALL: &str = "Call"; // for extensions
 pub const OBJECT: &str = "Object";
 
 pub const BUILT_IN: &[&str] = &[
-    ONE_OF, SHUFFLE, LENGTH, FIND, RANDOM, FLOOR, FN, APP, HTTP, OBJECT, DEBUG, UUID, BASE64, HEX,
+    ONE_OF, SHUFFLE, LENGTH, FIND, RANDOM, FLOOR, FN, APP, CALL, HTTP, OBJECT, DEBUG, UUID, BASE64, HEX,
     JWT, CRYPTO, TIME, SMTP, EXISTS,
 ];
 

@@ -1,22 +1,19 @@
+use crate::data::{
+    ast::*,
+    data::{init_child_context, init_child_scope, Data},
+    error_info::ErrorInfo,
+    literal::create_error_info,
+    primitive::PrimitiveClosure,
+    tokens::*,
+    warnings::DisplayWarnings,
+    ArgsType, Literal, MemoryType, MessageData, Position, MSG,
+};
 use crate::error_format::*;
 use crate::interpreter::{
     builtins::{match_builtin, match_native_builtin},
     function_scope::exec_fn_in_new_scope,
     variable_handler::resolve_fn_args,
     variable_handler::save_literal_in_mem,
-};
-use crate::{
-    data::{
-        ast::*,
-        data::{init_child_context, init_child_scope, Data},
-        error_info::ErrorInfo,
-        literal::create_error_info,
-        primitive::PrimitiveClosure,
-        tokens::*,
-        warnings::DisplayWarnings,
-        ArgsType, Literal, MemoryType, MessageData, Position, MSG,
-    },
-    interpreter::extensions::match_extension,
 };
 
 use std::{collections::HashMap, sync::mpsc};
@@ -29,7 +26,6 @@ enum ObjType {
     NativeComponent,
     BuiltIn,
     BuiltInWithoutWarnings,
-    Extension,
     Function { fn_args: Vec<String>, scope: Expr },
     Import,
     Closure { fn_args: Vec<String>, scope: Expr },
@@ -63,16 +59,6 @@ fn get_type<'a>(name: &'a str, interval: Interval, data: &'a Data) -> ObjType {
 
     if BUILT_IN_WITHOUT_WARNINGS.contains(&name) {
         return ObjType::BuiltInWithoutWarnings;
-    }
-
-    if data
-        .context
-        .extension_info
-        .clone()
-        .map(|x| x.function_list.contains(&name.to_string()))
-        .unwrap_or_default()
-    {
-        return ObjType::Extension;
     }
 
     if let Some((
@@ -328,22 +314,6 @@ pub fn resolve_object(
                 resolve_fn_args(args, data, msg_data, &DisplayWarnings::Off, sender)?;
 
             let value = match_builtin(
-                &name,
-                resolved_args,
-                interval.to_owned(),
-                data,
-                msg_data,
-                sender,
-            );
-
-            Ok(MSG::send_error_msg(&sender, msg_data, value))
-        }
-
-        ObjType::Extension => {
-            let resolved_args =
-                resolve_fn_args(args, data, msg_data, &DisplayWarnings::On, sender)?;
-
-            let value = match_extension(
                 &name,
                 resolved_args,
                 interval.to_owned(),

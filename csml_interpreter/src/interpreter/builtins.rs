@@ -1,6 +1,7 @@
 pub mod api;
 pub mod crypto;
 pub mod exists;
+pub mod extensions;
 pub mod format;
 pub mod functions;
 pub mod http_builtin;
@@ -20,12 +21,14 @@ use std::sync::mpsc;
 use api::api;
 use crypto::crypto;
 use exists::exists;
+use extensions::extension;
 use format::*;
 use functions::*;
 use http_builtin::http;
 use jwt::jwt;
 use smtp::smtp;
 use time::time;
+
 // use uri::*;
 
 pub fn match_native_builtin(
@@ -58,6 +61,7 @@ pub fn match_builtin(
         BASE64 => base64(args, &data.context.flow, interval),
         HEX => hex(args, &data.context.flow, interval),
         FN | APP => api(args, interval, data, msg_data, sender),
+        CALL => extension(args, interval, data, msg_data, sender),
         ONE_OF => one_of(args, &data.context.flow, interval),
         OR_BUILT_IN => or(args, &data.context.flow, interval),
         SHUFFLE => shuffle(args, &data.context.flow, interval),

@@ -5,8 +5,7 @@ use crate::{
 };
 use std::sync::mpsc;
 
-pub fn match_extension(
-    name: &str,
+pub fn extension(
     args: ArgsType,
     interval: Interval,
     data: &mut Data,
@@ -20,14 +19,21 @@ pub fn match_extension(
         .map(|x| x.function_map)
         .unwrap_or_default();
 
-    let extension = extensions.get(name).cloned();
+    if let Some(name) = args.get("name", 0).map(|a| a.primitive.to_string()) {
+        let extension = extensions.get(&name).cloned();
 
-    if let Some(extension) = extension {
-        extension(args, interval, data, msg_data, sender)
+        if let Some(extension) = extension {
+            extension(args, interval, data, msg_data, sender)
+        } else {
+            Err(gen_error_info(
+                Position::new(interval, &data.context.flow),
+                format!("{} [{}]", ERROR_EXTENSION_UNKNOWN, name),
+            ))
+        }
     } else {
         Err(gen_error_info(
             Position::new(interval, &data.context.flow),
-            format!("{} [{}]", ERROR_EXTENSION_UNKNOWN, name),
+            ERROR_EXTENSION_UNKNOWN.to_owned(),
         ))
     }
 }
