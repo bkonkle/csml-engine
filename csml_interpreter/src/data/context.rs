@@ -28,16 +28,15 @@ pub struct ApiInfo {
     pub apps_endpoint: String,
 }
 
-pub trait Extension:
-    for<'r> Fn(
-        ArgsType,
-        Interval,
-        &mut Data,
-        &mut MessageData,
-        &Option<mpsc::Sender<MSG>>,
-    ) -> Result<Literal, ErrorInfo>
-    + Debug
-{
+pub trait Extension: Debug + Send {
+    fn execute(
+        &self,
+        args: ArgsType,
+        interval: Interval,
+        data: &mut Data<'_>,
+        message: &mut MessageData,
+        sender: &Option<mpsc::Sender<MSG>>,
+    ) -> Result<Literal, ErrorInfo>;
 }
 
 #[derive(Debug, Clone)]

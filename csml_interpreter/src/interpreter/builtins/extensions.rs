@@ -20,10 +20,10 @@ pub fn extension(
         .unwrap_or_default();
 
     if let Some(name) = args.get("name", 0).map(|a| a.primitive.to_string()) {
-        let extension = extensions.get(&name).cloned();
+        let ext = extensions.get(&name).cloned();
 
-        if let Some(extension) = extension {
-            extension(args, interval, data, msg_data, sender)
+        if let Some(ext) = ext {
+            ext.execute(args, interval, data, msg_data, sender)
         } else {
             Err(gen_error_info(
                 Position::new(interval, &data.context.flow),
