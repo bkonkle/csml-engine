@@ -1,12 +1,22 @@
-use crate::data::{
-    primitive::{PrimitiveObject, PrimitiveType},
-    Client, Hold, Interval, Literal,
+use std::{
+    fmt::Debug,
+    sync::{mpsc, Arc},
+};
+
+use crate::{
+    data::{
+        primitive::{PrimitiveObject, PrimitiveType},
+        Client, Hold, Interval, Literal,
+    },
+    error_format::ErrorInfo,
 };
 
 use crate::interpreter::{json_to_literal, memory_to_literal};
 
 use nom::lib::std::collections::HashMap;
 use serde::{Deserialize, Serialize};
+
+use super::{ArgsType, Data, MessageData, MSG};
 
 ////////////////////////////////////////////////////////////////////////////////
 // DATA STRUCTURE
@@ -16,6 +26,24 @@ use serde::{Deserialize, Serialize};
 pub struct ApiInfo {
     pub client: Client,
     pub apps_endpoint: String,
+}
+
+pub trait Extension:
+    for<'r> Fn(
+        ArgsType,
+        Interval,
+        &mut Data,
+        &mut MessageData,
+        &Option<mpsc::Sender<MSG>>,
+    ) -> Result<Literal, ErrorInfo>
+    + Debug
+{
+}
+
+#[derive(Debug, Clone)]
+pub struct ExtensionInfo {
+    pub function_list: Vec<String>,
+    pub function_map: HashMap<String, Arc<dyn Extension>>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -63,6 +91,7 @@ pub struct Context {
     pub current: HashMap<String, Literal>,
     pub metadata: HashMap<String, Literal>,
     pub api_info: Option<ApiInfo>,
+    pub extension_info: Option<ExtensionInfo>,
     pub hold: Option<Hold>,
     pub step: ContextStepInfo,
     pub flow: String,
@@ -135,6 +164,18 @@ impl Context {
             step: ContextStepInfo::Normal(step.to_owned()),
             flow: flow.to_owned(),
             previous_bot,
+            extension_info: None,
+        }
+    }
+
+    pub fn with_extensions(self, extensions: HashMap<String, Arc<dyn Extension>>) -> Self {
+        let extension_info = ExtensionInfo {
+            function_list: extensions.keys().map(|s| s.to_string()).collect(),
+            function_map: extensions,
+        };
+        Self {
+            extension_info: Some(extension_info),
+            ..self
         }
     }
 }

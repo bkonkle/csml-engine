@@ -168,6 +168,8 @@ pub const UUID: &str = "UUID";
 pub const TIME: &str = "Time";
 pub const EXISTS: &str = "Exists";
 
+pub const CALL: &str = "Call"; // for extensions
+
 pub const OBJECT: &str = "Object";
 
 pub const BUILT_IN: &[&str] = &[

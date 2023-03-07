@@ -1,6 +1,7 @@
 pub mod ast_interpreter;
 pub mod builtins;
 pub mod components;
+pub mod extensions;
 pub mod function_scope;
 pub mod json_to_rust;
 pub mod variable_handler;

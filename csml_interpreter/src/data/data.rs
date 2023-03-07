@@ -150,6 +150,7 @@ pub fn init_child_context(data: &Data) -> Context {
         current: HashMap::new(),
         metadata: data.context.metadata.clone(),
         api_info: data.context.api_info.clone(),
+        extension_info: data.context.extension_info.clone(),
         hold: None,
         step: data.context.step.clone(),
         flow: data.context.flow.clone(),

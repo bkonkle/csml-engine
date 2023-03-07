@@ -158,6 +158,7 @@ pub const ERROR_SMTP: &str =
 pub const ERROR_CRYPTO: &str =
     "CRYPTO builtin expects one argument of type string. Example: CRYPTO(\"text\")";
 pub const ERROR_BUILTIN_UNKNOWN: &str = "Unknown builtin";
+pub const ERROR_EXTENSION_UNKNOWN: &str = "Unknown extension";
 
 // ### native Components
 pub const ERROR_HTTP_NOT_DATA: &str = "bad format: no 'data' in HTTP response";
